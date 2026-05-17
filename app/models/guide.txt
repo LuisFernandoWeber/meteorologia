@@ -1,0 +1,12 @@
+models/
+models/
+
+Representa os OBJETOS do sistema.
+
+Aqui normalmente ficam:
+
+classes
+entidades
+modelos do banco
+
+No PonyORM isso vai ser MUITO importante.
