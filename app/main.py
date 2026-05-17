@@ -1,5 +1,4 @@
 from app.core.database import db
-from app.models.Estado import Estado
 
 
 try:

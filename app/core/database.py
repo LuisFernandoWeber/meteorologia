@@ -21,3 +21,4 @@ db.bind(
     filename=full_db_path,
     create_db=True #cria o banco automaticamente se não existir
 )
+
