@@ -1,0 +1,2 @@
+app/ 
+É onde fica o código principal do sistema.

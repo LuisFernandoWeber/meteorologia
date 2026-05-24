@@ -1,0 +1,2 @@
+core/ 
+Arquivos centrais usados pelo projeto inteiro.
