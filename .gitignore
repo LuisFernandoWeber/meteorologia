@@ -25,4 +25,4 @@ data/
 *.tmp
 
 #arquivos guides
-#*guide.txt
+*guide.txt

@@ -1,3 +1,0 @@
-Aqui fica a REGRA DE NEGÓCIO.
-
-Essa será provavelmente a pasta mais importante.
