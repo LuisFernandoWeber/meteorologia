@@ -1,7 +1,0 @@
-Responsável por RECEBER dados externos.
-
-Exemplos 
-browser coletor
-processing - Tratar os dados
-cleaner - Limpar os dados
-validator
