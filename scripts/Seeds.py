@@ -18,6 +18,18 @@ def seed_estado():
         if not Estado.get(sigla=sigla):
             Estado(nome=nome, sigla=sigla)
 
+#Região
+def seed_regiao():
+    regiao = [
+        ("meio_oeste", )
+    ]
+
+
+#Cidade
+def seed_cidade():
+    cidade = [
+        ("Caçador")
+    ]
 
 if __name__ == "__main__":
     executar()

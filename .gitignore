@@ -5,10 +5,6 @@ venv/
 __pycache__/
 *.pyc
 
-# Banco SQLite
-*.db
-data/
-
 # Variáveis de ambiente
 .env
 
@@ -26,3 +22,6 @@ data/
 
 #arquivos guides
 *guide.txt
+
+#testes
+test/

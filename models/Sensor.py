@@ -1,13 +1,14 @@
-from pony.orm import Required, LongStr, Set
+from pony.orm import Required, Optional, LongStr, Set
 from core.database import db
 from models.Estacao import Estacao
 
 
 class Sensor(db.Entity):
-    nome = Required(str)
-    unidade_medida = Required(str)
-    descricao = Required(LongStr)
+    nome = Optional(str)
+    nome_original = Required(str)
+    unidade_medida = Optional(str)
+    descricao = Optional(LongStr)
     ativa = Required(bool, default=True)
-    estacao = Required(Estacao)
+    estacao = Optional(Estacao)
     leitura = Set("Leitura")
     

@@ -12,3 +12,4 @@ class Estacao(db.Entity):
     cordenadas = Required(str)
     cidade = Required(Cidade)
     sensor = Set("Sensor")
+    
