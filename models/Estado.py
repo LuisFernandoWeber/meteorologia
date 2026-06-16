@@ -5,4 +5,4 @@ from core.database import db
 class Estado(db.Entity):
     nome = Required(str)
     sigla = Required(str)
-    regiao = Set("Regiao")
+    regiao = Set("Cidade")

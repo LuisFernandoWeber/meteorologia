@@ -6,3 +6,4 @@ class Origem(db.Entity):
     tipo = Required(str)
     hora_recebido = Required(datetime)
     Leitura = Set("Leitura")
+    
