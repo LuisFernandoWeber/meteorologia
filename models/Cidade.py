@@ -1,9 +1,9 @@
 from pony.orm import Required, Set
 from core.database import db
-from models.Regiao import Regiao
+from models.Estado import Estado
 
 
 class Cidade(db.Entity):
     nome = Required(str)
-    regiao = Required(Regiao)
+    estado = Required(Estado)
     estacao = Set("Estacao")

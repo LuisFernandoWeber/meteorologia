@@ -1,4 +1,4 @@
-from pony.orm import Required, Optional
+from pony.orm import Required, Optional, composite_key
 from decimal import Decimal
 from datetime import datetime
 from core.database import db
@@ -11,3 +11,5 @@ class Leitura(db.Entity):
     horario = Required(datetime)
     sensor = Required(Sensor)
     origem = Optional(Origem)
+
+    composite_key(sensor, horario)

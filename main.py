@@ -1,11 +1,23 @@
 from core.database import db
-import models
+from pony.orm import db_session
+from models import *
+from services.importarCSV import ImportarCSV
 
+db.generate_mapping(create_tables=False)
+
+
+
+
+"""
+    Importar tabelas Estacão Caçador
+""" 
+#Rodar bot da ANA (que salvará o arquivo no import)
+
+#Salvar dados
 try:
-    db.generate_mapping(create_tables=True)
-    print("Tabelas criadas com sucesso!")
-except Exception as e:
-    print(f"Erro ao criar as Tabelas. Erro: {e}")
+    ImportarCSV(nome_estacao="Estacao IFSC Cacador").executar()
+except Exception as erro:
+    print(f"ERRO: {erro}")
 
 
-print("Sistema inicializado")
+print("Sistema rodado com sucesso")

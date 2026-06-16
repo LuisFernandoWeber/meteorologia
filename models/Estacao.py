@@ -1,4 +1,4 @@
-from pony.orm import Required, Set
+from pony.orm import Required, Optional, Set
 from datetime import date
 from core.database import db
 from models.Cidade import Cidade
