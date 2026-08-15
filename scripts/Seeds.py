@@ -1,11 +1,23 @@
 from pony.orm import db_session
 from models import *
 
+"""
+    Seeds responsável por inserir os dados básicos no
+    banco de dados na implementação do sistema.
+    Esse aquivo é usado pelo scripts/migrate para após que
+    seja craido o banco ser executado a seeds.py
+"""
+
+
+# --- Fluxo de execução ---
+
 def executar():
     seed_estado()
     seed_cidade()
     seed_estacao()
 
+
+# --- Seeds ---
 
 #Estado
 @db_session
@@ -76,6 +88,8 @@ def seed_estacao():
                 cidade = cidade
             )
 
+
+# --- Ponto de entrada ---
 
 if __name__ == "__main__":
     executar()

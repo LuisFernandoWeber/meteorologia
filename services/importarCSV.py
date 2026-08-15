@@ -13,6 +13,22 @@ from pony.orm import TransactionIntegrityError
 TAMANHO_LOTE = 5000
 
 
+"""
+    ImportarCSV responsável por importar o arquivo .CSV patrão do 
+    Whatercloud contido na pasta imports gerada automaticamente pelo
+    scripts/robo.py e salva no banco de dados.
+
+    Este é capaz de salvar no bando de dados todos os dados 
+    meteorológicos tal qual seus respectivos sensores .
+    
+    Cuidados: Este services apenas consegue fazer a importação
+    quando há apenas um único arquivo .csv padrão whatercloud
+    contido na pasta.
+
+    Por fim, importarCSV.py é usado pelo main.py após a execução do 
+    scripts/robo.py responsável por baixar o aquivo .csv da plataforma .
+"""
+
 class ImportarCSV:
 
     #Construtor

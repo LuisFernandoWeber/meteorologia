@@ -15,10 +15,9 @@ from core.config import LOCAL_IMPORT
 
 
 """
-    Robo responsavel por logar no Weathercloud e exportar
-    o CSV com os dados da estacao para a pasta de Downloads.
-    Esse arquivo e usado pelo ImportarCSV (services/importarCSV.py)
-    em seguida, no main.py.
+    Robo responsável por logar no Weathercloud e exportar
+    o CSV com os dados da estacão para a pasta de imports.
+    Esse arquivo e usado pelo main.py
 """
 
 
@@ -42,7 +41,7 @@ def criar_navegador():
     download automatico habilitado direto para a pasta de import,
     a mesma pasta que o ImportarCSV le - LOCAL_IMPORT)."""
     pasta_download = str(LOCAL_IMPORT.resolve())  # <-- caminho absoluto
-    LOCAL_IMPORT.mkdir(parents=True, exist_ok=True)  # <-- garante que existe
+    LOCAL_IMPORT.mkdir(parents=True, exist_ok=True)  # <-- garante que existe(se não existir criará a pasta)
 
     chrome_options = Options()
     prefs = {
@@ -190,14 +189,15 @@ def executar():
     """Roda o robo por completo: login no Weathercloud + exportacao do
     CSV do ano atual para a pasta de Downloads."""
     usuario, senha = obter_credenciais()
-    navegador, pasta_download = criar_navegador()
+    navegador, _ = criar_navegador()
 
     try:
         realizar_login(navegador, usuario, senha)
         exportar_dados_ano_atual(navegador)
-        print(f"Processo concluido. Verifique a pasta: {pasta_download}")
+        print("Processo de dowload Whatercloud concluido.")
     finally:
         navegador.quit()
+        print("Falha no processo de dowload Whatercloud concluido.")
 
 
 if __name__ == "__main__":
