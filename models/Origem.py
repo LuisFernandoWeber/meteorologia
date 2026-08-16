@@ -1,9 +1,9 @@
-from pony.orm import Required, Set
-from datetime import datetime
+from pony.orm import Required, Optional, Set
 from core.database import db
 
 class Origem(db.Entity):
     tipo = Required(str)
-    hora_recebido = Required(datetime)
-    Leitura = Set("Leitura")
-    
+    formato = Required(str)
+    descricao = Optional(str)
+    leitura = Set("Leitura")
+
