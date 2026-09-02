@@ -15,6 +15,7 @@ def executar():
     seed_estado()
     seed_cidade()
     seed_estacao()
+    seed_origem()
 
 
 # --- Seeds ---
@@ -69,7 +70,6 @@ def seed_cidade():
             estado = Estado.get(sigla = sigla_estado)
             Cidade(nome=nome, estado=estado)
 
-
 #Estacao
 @db_session
 def seed_estacao():
@@ -87,6 +87,23 @@ def seed_estacao():
                 cordenadas = cordenadas,
                 cidade = cidade
             )
+
+# Origem
+@db_session
+def seed_origem():
+    origens = [
+        ("WeatherCloud", "csv", "Arquivos fornecidos pelo banco de dados WeatherCloud da estação do IFSC"),
+        ("Lora", "JSON", "Dados recebidos pelo dispositivo Lora implementado na estacão"),
+    ]
+
+    for tipo, formato, descricao in origens:
+        if not Origem.get(tipo=tipo):
+            Origem(
+                tipo=tipo,
+                formato=formato,
+                descricao=descricao
+            )
+
 
 
 # --- Ponto de entrada ---

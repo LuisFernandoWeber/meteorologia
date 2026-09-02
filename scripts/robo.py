@@ -10,8 +10,14 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from webdriver_manager.chrome import ChromeDriverManager
-
 from core.config import LOCAL_IMPORT
+import logging
+
+
+
+logger = logging.getLogger(__name__)
+
+
 
 
 """
@@ -79,12 +85,11 @@ def fechar_popup_upgrade(navegador, timeout=8):
                 EC.element_to_be_clickable((By.XPATH, seletor))
             )
             navegador.execute_script("arguments[0].click();", botao)
-            print("Popup fechado.")
             time.sleep(1)
             return True
         except TimeoutException:
             continue
-    print("Nenhum popup encontrado (ou ja estava fechado).")
+    logger.warning("Nenhum popup encontrado (ou ja estava fechado).")
     return False
 
 
@@ -117,10 +122,8 @@ def selecionar_ano(navegador, ano, select_id="database-select-year"):
     """
     resultado = navegador.execute_script(script, select_id, str(ano))
     if resultado == "no-select":
-        print(f"AVISO: nao encontrei <select id='{select_id}'>. "
-              f"Confirme o id real do dropdown 'Ano' no HTML.")
-    else:
-        print(f"Ano selecionado: {ano}")
+        logger.error(f"AVISO: nao encontrei <select id='{select_id}'>. Confirme o id real do dropdown 'Ano' no HTML.")
+
     return resultado
 
 
@@ -132,7 +135,6 @@ def clicar_exportar(navegador, timeout=10):
     )
     navegador.execute_script("arguments[0].scrollIntoView({block: 'center'});", botao)
     navegador.execute_script("arguments[0].click();", botao)
-    print("Cliquei em Exportar.")
 
 
 # --- Etapas do fluxo ---
@@ -194,10 +196,11 @@ def executar():
     try:
         realizar_login(navegador, usuario, senha)
         exportar_dados_ano_atual(navegador)
-        print("Processo de dowload Whatercloud concluido.")
+        logger.info("Processo de download Weathercloud concluído com sucesso")
+    except Exception:
+        logger.exception("Falha no processo de download Weathercloud")
     finally:
         navegador.quit()
-        print("Falha no processo de dowload Whatercloud concluido.")
 
 
 if __name__ == "__main__":

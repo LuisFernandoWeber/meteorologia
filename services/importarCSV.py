@@ -8,8 +8,11 @@ from core.database import db
 from pony.orm import db_session
 from decimal import Decimal
 from pony.orm import TransactionIntegrityError
+import logging
 
 
+
+logger = logging.getLogger(__name__)
 TAMANHO_LOTE = 5000
 
 
@@ -31,36 +34,46 @@ TAMANHO_LOTE = 5000
 
 class ImportarCSV:
 
-    #Construtor
+    # --- Construtor ---
     @db_session
-    def __init__(self, nome_estacao):
+    def __init__(self, nome_estacao, tipo_origem):
         estacao = Estacao.get(nome=nome_estacao)
         if not estacao:
-            raise ValueError("Estação não encontrada")
+            raise ValueError(f"Estação {nome_estacao} não encontrada")
+
+        origem = Origem.get(tipo = tipo_origem)
+        if not origem:
+            raise ValueError(f"Origem {tipo_origem} não encontrada")
+
+
         self.id_estacao = estacao.id
-    
+        self.id_origem = origem.id
+
+
+    # --- Funções de controle ---
+
+    # Valida e coleta os nomes dos arquivos contidos na pasta imports
     def verificar_arquivo(self):
         arquivos = [arquivo for arquivo in LOCAL_IMPORT.iterdir() if arquivo.is_file()]
+        nomes_arquivos = list()
 
-        #Se não tiver um arquivo
         if not arquivos:
-            raise FileNotFoundError("Nenhum arquivo encontrado")
+            raise FileNotFoundError("Nenhum arquivo encontrado na pasta imports")
 
-        #Somente processar caso a quantidade de arquivo ser igua a 1
-        if len(arquivos) == 1:
-            arquivo = arquivos[0]
+
+        for arquivo in arquivos:
 
             nome = arquivo.stem
-            formato = arquivo.suffix   
+            formato = arquivo.suffix
 
             if formato != ".csv":
-                raise ValueError(f"Formato de arquivo inválido: {formato}")
+                raise ValueError(f"Formato de arquivo {nome}{formato} inválido na pasta imports")
 
-            return nome
-        
-        #Caso ter mais que um arquivo
-        raise ValueError("Mais de um arquivo encontrado na pasta Import")
+            nomes_arquivos.append(nome)
 
+        return nomes_arquivos
+
+    # Normaliza o arquivo CSV fornecido pelo whatercloud
     def normalizar_arquivo_csv(self, nome_arquivo:str):
         lista_normalizada = list()
 
@@ -84,17 +97,21 @@ class ImportarCSV:
         data_io = StringIO("".join(lista_normalizada))
         return data_io
 
+    # Carregar o dataset
     def carregar_dataset(self, data_io):
         data = pd.read_csv(data_io, sep=";")
         data = data.loc[:, ~data.columns.str.startswith("Unnamed")] #Remove colunas vazias
         return data
 
-    """
-        Procedimento que cria os sensores na tabela sensores de acordo com o nome_original
-        data_pandas: Dataset pandas carregado
-    """
+
+    # --- Funções de Manipulação do Banco de dados ---
+
     @db_session
     def criar_sensores(self, data_pandas: pd.DataFrame):
+        """
+            Procedimento que cria os sensores na tabela sensores de acordo com o nome_original
+            data_pandas: Dataset pandas carregado
+        """
         colunas = data_pandas.columns
         estacao = Estacao[self.id_estacao]
 
@@ -136,7 +153,8 @@ class ImportarCSV:
                 lote.append((
                     float(valor_raw),    
                     horario,
-                    sensores[coluna],     
+                    sensores[coluna],
+                    self.id_origem,  
                 ))
 
                 # Quando o lote encher, executa e limpa
@@ -149,10 +167,11 @@ class ImportarCSV:
             total_inserido += self._executar_lote(lote)
 
         print(f"[INFO] Importação concluída: {total_inserido} registros inseridos.")
+        logger.info(f"Importação concluída: {total_inserido} registros inseridos.")
 
     @db_session
     def _executar_lote(self, lote: list) -> int:
-        sql = "INSERT IGNORE INTO leitura (valor, horario, sensor) VALUES (%s, %s, %s)"
+        sql = "INSERT IGNORE INTO leitura (valor, horario, sensor, origem) VALUES (%s, %s, %s, %s)"
         conn = db.get_connection()
         cursor = conn.cursor()
         cursor.executemany(sql, lote)
@@ -161,25 +180,37 @@ class ImportarCSV:
         cursor.close()
         return inseridos
 
+    # Excluir o arquivo .csv de acordo com o nome
     def excluir_arquivo(self, nome_arquivo: str):
         arquivo = LOCAL_IMPORT / f"{nome_arquivo}.csv"
         arquivo.unlink()
 
+
+    # --- Ponto de etrada ---
+
     def executar(self):
-        nome_arquivo = self.verificar_arquivo()
-        data_io = self.normalizar_arquivo_csv(nome_arquivo)
-        data = self.carregar_dataset(data_io)
+        nomes_arquivos = self.verificar_arquivo()
+        logger.info(f"Arquivos encontrados para importação: {nomes_arquivos}")
 
-        self.criar_sensores(data)
-        self.salvar_medidas(data)
-        
-        self.excluir_arquivo(nome_arquivo=nome_arquivo)
+        for nome_arquivo in nomes_arquivos:
+            try:
+                data_io = self.normalizar_arquivo_csv(nome_arquivo)
+                data = self.carregar_dataset(data_io)
+
+                self.criar_sensores(data)
+                self.salvar_medidas(data)
+                
+                self.excluir_arquivo(nome_arquivo=nome_arquivo)
+                logger.info(f"Arquivo '{nome_arquivo}.csv' importado e removido com sucesso")
+            except Exception as erro:
+                logger.exception(f"Falha ao importar o arquivo '{nome_arquivo}.csv'")
 
 
 
-
+#TESTES - APAGAR NO PROJETO FINAL
 if __name__ == "__main__":
     db.generate_mapping(create_tables=False)
-    importador = ImportarCSV(estacao=1)
-    importador.executar()
-
+    ImportarCSV(
+                nome_estacao = "Estacao IFSC Cacador", 
+                tipo_origem = "WeatherCloud"
+    ).executar()
