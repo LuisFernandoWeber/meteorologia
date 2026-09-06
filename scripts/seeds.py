@@ -1,11 +1,24 @@
 from pony.orm import db_session
 from models import *
 
+"""
+    Seeds responsável por inserir os dados básicos no
+    banco de dados na implementação do sistema.
+    Esse aquivo é usado pelo scripts/migrate para após que
+    seja craido o banco ser executado a seeds.py
+"""
+
+
+# --- Fluxo de execução ---
+
 def executar():
     seed_estado()
     seed_cidade()
     seed_estacao()
+    seed_origem()
 
+
+# --- Seeds ---
 
 #Estado
 @db_session
@@ -57,7 +70,6 @@ def seed_cidade():
             estado = Estado.get(sigla = sigla_estado)
             Cidade(nome=nome, estado=estado)
 
-
 #Estacao
 @db_session
 def seed_estacao():
@@ -76,6 +88,25 @@ def seed_estacao():
                 cidade = cidade
             )
 
+# Origem
+@db_session
+def seed_origem():
+    origens = [
+        ("WeatherCloud", "csv", "Arquivos fornecidos pelo banco de dados WeatherCloud da estação do IFSC"),
+        ("Lora", "JSON", "Dados recebidos pelo dispositivo Lora implementado na estacão"),
+    ]
+
+    for tipo, formato, descricao in origens:
+        if not Origem.get(tipo=tipo):
+            Origem(
+                tipo=tipo,
+                formato=formato,
+                descricao=descricao
+            )
+
+
+
+# --- Ponto de entrada ---
 
 if __name__ == "__main__":
     executar()

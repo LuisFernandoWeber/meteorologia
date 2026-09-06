@@ -28,3 +28,10 @@ test/
 
 #Imports
 imports/*
+
+#Logs
+logs/*
+
+#IA
+IA/teste_pressao_atmosferica.csv
+
