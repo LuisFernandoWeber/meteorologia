@@ -10,6 +10,6 @@ class Leitura(db.Entity):
     valor = Required(Decimal, scale=2)
     horario = Required(datetime)
     sensor = Required(Sensor)
-    origem = Optional(Origem)
+    origem = Required(Origem)
 
     composite_key(sensor, horario)
